@@ -64,17 +64,17 @@
         const { pose, posenetOutput } = await model.estimatePose(webcam.canvas);
         // Prediction 2: run input through teachable machine classification model
         const prediction = await model.predict(posenetOutput);
-        if (prediction[0].probability.tofixed(2) >= 0.9) {
+        if (prediction[0].probability.tofixed(2) > 0.90) {
           labelContainer.childNodes[0].innerHTML =
             "좋은 스쿼트 자세이군요! " + count;
           status = "squat";
-        } else if (prediction[1].probability.tofixed(2) >= 0.9) {
+        } else if (prediction[1].probability.tofixed(2) > 0.90) {
           labelContainer.childNodes[0].innerHTML = "서 있군요! " + count;
           if ((status = "squat")) {
             count++;
           }
           status = "stand";
-        } else if (prediction[2].probability.tofixed(2) >= 0.9) {
+        } else if (prediction[2].probability.tofixed(2) > 0.90) {
           labelContainer.childNodes[0].innerHTML = "왜 쉬세요? " + count;
           if (status == "squat" || status == "stand") {
           }
