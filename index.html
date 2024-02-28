@@ -55,22 +55,34 @@
         await predict();
         window.requestAnimationFrame(loop);
       }
-
+      var count = 0;
+      var status = "stand";
       async function predict() {
         // Prediction #1: run input through posenet
         // estimatePose can take in an image, video or canvas html element
         const { pose, posenetOutput } = await model.estimatePose(webcam.canvas);
         // Prediction 2: run input through teachable machine classification model
         const prediction = await model.predict(posenetOutput);
-
-        for (let i = 0; i < maxPredictions; i++) {
-          const classPrediction =
-            prediction[i].className +
-            ": " +
-            prediction[i].probability.toFixed(2);
-          labelContainer.childNodes[i].innerHTML = classPrediction;
+        if (prediction[0].probability.toFixed(2) >= 0.9) {
+          status = "squat";
+          labelContainer.childNodes[0].innerHTML =
+            "좋은 squat 자세군요 " + count;
+        } else if (prediction[1].probability.toFixed(2) >= 0.9) {
+          if (status == "squat") {
+            count++;
+            var audio = new Audio("one.mp3");
+            audio.play();
+          }
+          status = "stand";
+          labelContainer.childNodes[0].innerHTML = "서 있군요!" + count;
+        } else if (prediction[2].probability.toFixed(2) >= 0.9) {
+          if (status == "squat" || status == "stand") {
+            var audio = new Audio("strange.mp3");
+            audio.play();
+          }
+          status = "strange";
+          labelContainer.childNodes[0].innerHTML = "왜 쉬세요?" + count;
         }
-
         // finally draw the poses
         drawPose(pose);
       }
